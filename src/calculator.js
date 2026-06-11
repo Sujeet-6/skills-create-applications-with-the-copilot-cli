@@ -7,16 +7,11 @@
  *  - Subtraction (-)
  *  - Multiplication (*)
  *  - Division (/)
+ *  - Modulo (%)
+ *  - Exponentiation (pow, ^)
+ *  - Square root (sqrt)
  *
  * Exports a reusable module API and also provides a simple CLI entrypoint.
- *
- * Examples (CLI):
- *  node src/calculator.js add 2 3
- *  node src/calculator.js + 5 4
- *
- * Examples (module):
- *  const { add } = require('./src/calculator');
- *  add(1, 2) // 3
  */
 
 function toNumber(value) {
@@ -42,60 +37,101 @@ function divide(a, b) {
   return a / b;
 }
 
-module.exports = { add, subtract, multiply, divide };
+function mod(a, b) {
+  if (b === 0) throw new Error('Modulo by zero');
+  return a % b;
+}
+
+function pow(a, b) {
+  return Math.pow(a, b);
+}
+
+function sqrt(a) {
+  if (a < 0) throw new Error('Square root of negative number');
+  return Math.sqrt(a);
+}
+
+module.exports = { add, subtract, multiply, divide, mod, pow, sqrt };
 
 // CLI entrypoint
 if (require.main === module) {
-  const [, , op, aRaw, bRaw] = process.argv;
+  const argv = process.argv.slice(2);
+  const op = argv[0];
 
-  if (!op || aRaw === undefined || bRaw === undefined) {
-    console.error('Usage: node src/calculator.js <operation> <a> <b>');
-    console.error('Operations: add | +, subtract | -, multiply | *, divide | /');
+  if (!op) {
+    console.error('Usage: node src/calculator.js <operation> <args...>');
+    console.error('Operations: add | +, subtract | -, multiply | *, divide | /, mod | %, pow | ^, sqrt');
     process.exit(1);
-  }
-
-  let a, b;
-  try {
-    a = toNumber(aRaw);
-    b = toNumber(bRaw);
-  } catch (err) {
-    console.error(err.message);
-    process.exit(2);
   }
 
   try {
     let result;
     switch (op) {
       case 'add':
-      case '+':
+      case '+': {
+        if (argv.length < 3) throw new Error('add requires two arguments');
+        const a = toNumber(argv[1]);
+        const b = toNumber(argv[2]);
         result = add(a, b);
         break;
+      }
       case 'subtract':
-      case '-':
+      case '-': {
+        if (argv.length < 3) throw new Error('subtract requires two arguments');
+        const a = toNumber(argv[1]);
+        const b = toNumber(argv[2]);
         result = subtract(a, b);
         break;
+      }
       case 'multiply':
       case '*':
       case 'x':
-      case 'X':
+      case 'X': {
+        if (argv.length < 3) throw new Error('multiply requires two arguments');
+        const a = toNumber(argv[1]);
+        const b = toNumber(argv[2]);
         result = multiply(a, b);
         break;
+      }
       case 'divide':
       case '/':
-      case '÷':
+      case '÷': {
+        if (argv.length < 3) throw new Error('divide requires two arguments');
+        const a = toNumber(argv[1]);
+        const b = toNumber(argv[2]);
         result = divide(a, b);
         break;
+      }
+      case 'mod':
+      case '%': {
+        if (argv.length < 3) throw new Error('mod requires two arguments');
+        const a = toNumber(argv[1]);
+        const b = toNumber(argv[2]);
+        result = mod(a, b);
+        break;
+      }
+      case 'pow':
+      case '^': {
+        if (argv.length < 3) throw new Error('pow requires two arguments');
+        const a = toNumber(argv[1]);
+        const b = toNumber(argv[2]);
+        result = pow(a, b);
+        break;
+      }
+      case 'sqrt':
+      case '√': {
+        if (argv.length < 2) throw new Error('sqrt requires one argument');
+        const a = toNumber(argv[1]);
+        result = sqrt(a);
+        break;
+      }
       default:
-        console.error(`Unknown operation: ${op}`);
-        console.error('Supported: add | +, subtract | -, multiply | *, divide | /');
-        process.exit(3);
+        throw new Error(`Unknown operation: ${op}`);
     }
 
-    // Print result (integer if whole, otherwise floating)
-    if (Number.isInteger(result)) console.log(result);
-    else console.log(result);
+    console.log(result);
   } catch (err) {
     console.error('Error:', err.message);
-    process.exit(4);
+    process.exit(2);
   }
 }
