@@ -51,7 +51,21 @@ function sqrt(a) {
   return Math.sqrt(a);
 }
 
-module.exports = { add, subtract, multiply, divide, mod, pow, sqrt };
+function modulo(a, b) {
+  if (b === 0) throw new Error('Modulo by zero');
+  return a % b;
+}
+
+function power(base, exponent) {
+  return Math.pow(base, exponent);
+}
+
+function squareRoot(n) {
+  if (n < 0) throw new Error('Square root of negative number');
+  return Math.sqrt(n);
+}
+
+module.exports = { add, subtract, multiply, divide, mod, pow, sqrt, modulo, power, squareRoot };
 
 // CLI entrypoint
 if (require.main === module) {
